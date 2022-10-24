@@ -46,24 +46,27 @@ public class ServerSocketJava {
 //            System.err.println(e);
 //        }
 //    }
+        System.out.println("Server started...");
+        int port = 8080;
+        while (true) {
+            try (ServerSocket server = new ServerSocket(port);) { // порт можете выбрать любой в доступном диапазоне 0-65536. Но чтобы не нарваться на уже занятый - рекомендуем использовать около 8080
+                try (Socket clientSocket = server.accept(); // ждем подключения
+                     PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                ) {
 
-        try (ServerSocket server = new ServerSocket(8080);) { // порт можете выбрать любой в доступном диапазоне 0-65536. Но чтобы не нарваться на уже занятый - рекомендуем использовать около 8080
-            try (Socket clientSocket = server.accept(); // ждем подключения
-                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            ) {
+                    System.out.println("New connection accepted");
+                    final String name = in.readLine();
+                    out.println(String.format("Hi %s, your port is %d", name, clientSocket.getPort()));
 
-                System.out.println("New connection accepted");
-                final String name = in.readLine();
-                out.println(String.format("Hi %s, your port is %d", name, clientSocket.getPort()));
-
-            } catch (SocketException e) {
-                // если не получилось создать сокет
-                System.out.println("Socket: " + e.getMessage());
+                } catch (SocketException e) {
+                    // если не получилось создать сокет
+                    System.out.println("Socket: " + e.getMessage());
+                }
+            } catch (IOException e) {
+                // ошибка при приеме
+                System.out.println("IO: " + e.getMessage());
             }
-        } catch (IOException e) {
-            // ошибка при приеме
-            System.out.println("IO: " + e.getMessage());
         }
     }
 }
